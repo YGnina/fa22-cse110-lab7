@@ -32,7 +32,7 @@ async function init() {
  * Detects if there's a service worker, then loads it and begins the process
  * of installing it and getting it running
  */
-function initializeServiceWorker() {
+async function initializeServiceWorker() {
   // EXPLORE - START (All explore numbers start with B)
   /*******************/
   // ServiceWorkers have many uses, the most common of which is to manage
@@ -45,15 +45,34 @@ function initializeServiceWorker() {
   // We first must register our ServiceWorker here before any of the code in
   // sw.js is executed.
   // B1. TODO - Check if 'serviceWorker' is supported in the current browser
-  // B2. TODO - Listen for the 'load' event on the window object.
-  // Steps B3-B6 will be *inside* the event listener's function created in B2
-  // B3. TODO - Register './sw.js' as a service worker (The MDN article
-  //            "Using Service Workers" will help you here)
-  // B4. TODO - Once the service worker has been successfully registered, console
-  //            log that it was successful.
-  // B5. TODO - In the event that the service worker registration fails, console
-  //            log that it has failed.
-  // STEPS B6 ONWARDS WILL BE IN /sw.js
+  if ("serviceWorker" in navigator) {
+
+    // B2. TODO - Listen for the 'load' event on the window object.
+    window.addEventListener('load', async (event) => {
+
+      // Steps B3-B6 will be *inside* the event listener's function created in B2
+      // B3. TODO - Register './sw.js' as a service worker (The MDN article
+      //            "Using Service Workers" will help you here)
+      // B4. TODO - Once the service worker has been successfully registered, console
+      //            log that it was successful.
+      // B5. TODO - In the event that the service worker registration fails, console
+      //            log that it has failed.
+      // STEPS B6 ONWARDS WILL BE IN /sw.js
+      
+      try {
+        await navigator.serviceWorker.register("/sw.js", //B3
+        (event) => {
+          console.log('succeed');       //B4
+        });
+      }catch(err){
+        console.error(`faild ${err}`);  //B5
+      }
+          
+    });
+    
+  }
+  
+  
 }
 
 /**
@@ -70,12 +89,12 @@ async function getRecipes() {
   //            If there are recipes, return them.
   
   
-  // let recipes = localStorage.getItem('recipes');//recipes = localStorage.getItem('recipes');
+  let recipes = localStorage.getItem('recipes');
   // if(recipes){
   //   return JSON.parse(recipes);
   // }
   if(localStorage.length>0){
-    return JSON.parse(localStorage.getItem('recipes'));
+    return JSON.parse(recipes);
   }
 
   /**************************/
@@ -130,12 +149,12 @@ async function getRecipes() {
 
         if(recipeArr.length == RECIPE_URLS.length){   //A9
           saveRecipesToStorage(recipeArr);
-          Promise.resolve(recipes);
+          Promise.resolve(recipeArr);
         }
 
-      } catch(e){
-        console.error(e);                             //A10
-        reject(e);                                    //A11
+      } catch(err){
+        console.error(err);                             //A10
+        reject(err);                                    //A11
       }
 
     }
